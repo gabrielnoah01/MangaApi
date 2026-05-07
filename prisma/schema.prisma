@@ -47,14 +47,14 @@ enum MangaWorkflowStatus {
 }
 
 model User {
-    id          Int           @id @default(autoincrement())
+    id          String           @id @default(uuid())
     name        String
     email       String        @unique
     password    String
     photo       String?
     role        UserRole      @default(USER)
     roleGrantedAt DateTime?
-    roleGrantedById Int?
+    roleGrantedById String?
     reviews     Review[]
     favorites   Favorite[]
     readingList ReadingList[]
@@ -65,6 +65,7 @@ model User {
     createdMangas Manga[]     @relation("MangaCreatedBy")
     updatedMangas Manga[]     @relation("MangaUpdatedBy")
     approvedMangas Manga[]    @relation("MangaApprovedBy")
+    author Author?
     moderationActions MangaModerationLog[] @relation("ModerationActionBy")
     createdAt   DateTime      @default(now())
     updatedAt   DateTime      @updatedAt
@@ -76,10 +77,9 @@ model User {
 }
 
 model Manga {
-    id               Int           @id @default(autoincrement()) 
-    title            String
-    slug             String        @unique
-    authorId         Int
+    id               String           @id @default(uuid())
+    title            String        @unique
+    authorId         String
     authorProfile    Author        @relation(fields: [authorId], references: [id], onDelete: Restrict)
     description      String?
     status           MangaStatus   @default(ONGOING)
@@ -97,9 +97,9 @@ model Manga {
     averageRating    Float         @default(0)
     lastChapterAt    DateTime?
     workflowStatus   MangaWorkflowStatus @default(DRAFT)
-    createdById      Int
-    updatedById      Int?
-    approvedById     Int?
+    createdById      String
+    updatedById      String?
+    approvedById     String?
     submittedAt      DateTime?
     approvedAt       DateTime?
     publishedAt      DateTime?
@@ -129,13 +129,13 @@ model Manga {
 }
 
 model CreatorApplication {
-    id            Int            @id @default(autoincrement())
-    userId        Int
+    id            String            @id @unique @default(uuid())
+    userId        String       @unique
     requestedRole UserRole       @default(CONTRIBUTOR)
     status        ApprovalStatus @default(PENDING)
     justification String?
     portfolioUrl  String?
-    reviewedById  Int?
+    reviewedById  String?
     reviewedAt    DateTime?
     decisionNote  String?
     createdAt     DateTime       @default(now())
@@ -152,9 +152,9 @@ model CreatorApplication {
 }
 
 model MangaModerationLog {
-    id             Int                @id @default(autoincrement())
-    mangaId        Int
-    actionById     Int
+    id             String                @id @default(uuid())
+    mangaId        String              @unique
+    actionById     String
     action         String
     fromStatus     MangaWorkflowStatus?
     toStatus       MangaWorkflowStatus?
@@ -170,24 +170,27 @@ model MangaModerationLog {
 }
 
 model Author {
-    id        Int      @id @default(autoincrement())
+    id        String      @id
     name      String   @unique
     slug      String   @unique
     bio       String?
+    userEmail String   @unique
+    user      User     @relation(fields: [id], references: [id], onDelete: Cascade)
     mangas    Manga[]
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
     deletedAt DateTime?
 
     @@index([name])
+    @@index([userEmail])
 }
 
 model Review {
-    id        Int      @id @default(autoincrement())
+    id        String      @id @default(uuid())
     rating    Int
     comment   String
-    userId    Int
-    mangaId   Int
+    userId    String
+    mangaId   String
     user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
     manga     Manga    @relation(fields: [mangaId], references: [id], onDelete: Cascade)
     createdAt DateTime @default(now())
@@ -201,9 +204,9 @@ model Review {
 }
 
 model Favorite {
-    id        Int      @id @default(autoincrement())
-    userId    Int
-    mangaId   Int
+    id        String      @id @default(uuid())
+    userId    String         @unique
+    mangaId   String
     user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
     manga     Manga    @relation(fields: [mangaId], references: [id], onDelete: Cascade)
     createdAt DateTime @default(now())
@@ -216,9 +219,9 @@ model Favorite {
 }
 
 model ReadingList {
-    id        Int           @id @default(autoincrement())
-    userId    Int
-    mangaId   Int
+    id        String           @id @default(uuid())
+    userId    String           @unique
+    mangaId   String
     status    ReadingStatus @default(PLAN_TO_READ)
     user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
     manga     Manga         @relation(fields: [mangaId], references: [id], onDelete: Cascade)
@@ -234,10 +237,10 @@ model ReadingList {
 }
 
 model Chapter {
-    id        Int      @id @default(autoincrement())
-    title     String
-    mangaId   Int
-    number    Int
+    id        String      @id @default(uuid())
+    title     String    @unique
+    mangaId   String @unique
+    number    Int @unique
     slug      String?
     language  String   @default("pt-BR")
     pages     Page[]
@@ -255,8 +258,8 @@ model Chapter {
 }
 
 model Page {
-    id             Int      @id @default(autoincrement())
-    chapterId      Int
+    id             String      @id @default(uuid())
+    chapterId      String
     number         Int
     orderIndex     Int?
     isDoublePage   Boolean  @default(false)

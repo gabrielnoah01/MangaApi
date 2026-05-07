@@ -1,10 +1,10 @@
 import { Elysia } from "elysia";
 import openapi from "@elysiajs/openapi";
 import * as z from "zod";
-import { SignUpRoute } from "./routes/sign-up";
-import { SignInRoute } from "./routes/sign-in";
-import { AddMangaRoute } from "./routes/add-manga";
-import { UploadImageRoute } from "./routes/upload-image";
+import { SignUpRoute } from "./routes/User/sign-up";
+import { SignInRoute } from "./routes/User/sign-in";
+import { AddMangaRoute } from "./routes/Manga/add-manga";
+import { UploadImageRoute } from "./routes/Manga/upload-image";
 import PrismaClient from "@prisma/client";
 export const prisma  = new PrismaClient.PrismaClient();
 

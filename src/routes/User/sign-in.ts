@@ -1,14 +1,21 @@
 import Elysia from "elysia";
 import z from "zod";
+import { prisma } from "../..";
 
-export const SignInRoute = new Elysia().get("/sign-in", ({body}) => {
+export const SignInRoute = new Elysia().post("/sign-in", async ({body}) => {
+  const user = await prisma.user.findUnique({
+    where: {
+      email: body.email
+    }
+  })
+  if (!user) return { message: "User not found", status: 404 }
   console.log("User signed in with:", body);
   return { message: "Sign in successful" };
 },{
   body: z.object({
-    username: z.string(),
+    name: z.string(),
     password: z.string(),
-    email: z.string().email().optional()
+    email: z.string().email()
   }),
   detail: {
     tags: ["Authentication"],
