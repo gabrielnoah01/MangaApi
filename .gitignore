@@ -6,7 +6,7 @@
 .pnp.js
 .gitignore
 .env
-./uploads/Mangas
+/uploads/Mangas
 # testing
 /coverage
 
