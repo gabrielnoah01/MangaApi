@@ -6,8 +6,12 @@ import { SignInRoute } from "./routes/User/sign-in";
 import { AddMangaRoute } from "./routes/Manga/add-manga";
 import { UploadImageRoute } from "./routes/Manga/upload-image";
 import PrismaClient from "@prisma/client";
+import { FindMangaRoute } from "./routes/Manga/find-manga";
+import { findChapterRoute } from "./routes/Manga/find-chapter";
+import staticPlugin from "@elysiajs/static";
+import { getPages } from "./routes/Manga/getPages";
 export const prisma  = new PrismaClient.PrismaClient();
-
+import { join } from "path";
 const app = new Elysia().use(openapi({
   mapJsonSchema: {
     zod: z.toJSONSchema
@@ -22,7 +26,11 @@ const app = new Elysia().use(openapi({
 .use(SignInRoute)
 .use(AddMangaRoute)
 .use(UploadImageRoute)
+.use(FindMangaRoute)
+.use(findChapterRoute)
+.use(getPages)
 .listen(3000);
+app.use(staticPlugin({ assets: join(process.cwd(), "uploads"), prefix: "/" }));
 
 console.log(
   `Elysia is running at http://${app.server?.hostname}:${app.server?.port}`
