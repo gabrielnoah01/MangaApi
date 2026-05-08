@@ -1,6 +1,5 @@
 import Elysia from "elysia";
 import z from "zod";
-import * as fs from "fs";
 import { prisma } from "../..";
 
 export const getPages = new Elysia().get("/get-pages", async ({ query }) => {

@@ -1,7 +1,6 @@
 import Elysia from "elysia";
 import z from "zod";
 import { prisma } from "../..";
-import { id } from "zod/v4/locales";
 
 export const AddMangaRoute = new Elysia().post("/add-manga", async ({body}) => {
 
